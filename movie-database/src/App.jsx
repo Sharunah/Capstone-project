@@ -1,35 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import SearchBar from "./components/SearchBar";
+import MovieCard from "./components/MovieCard";
+import MovieDetails from "./components/MovieDetails";
+import { searchMovies, getMovieDetails } from "./services/movieService";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+
+
+  const handleSearch = async (query) => {
+    try {
+      const results = await searchMovies(query);
+      setMovies(results);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleMovieClick = async (id) => {
+    try {
+      const movie = await getMovieDetails(id);
+      setSelectedMovie(movie);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container mx-auto p-4">
+      <SearchBar onSearch={handleSearch} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {movies.map((movie) => (
+          <MovieCard key={movie.imdbID} movie={movie} onClick={handleMovieClick} />
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      {selectedMovie && <MovieDetails movie={selectedMovie} />}
+    </div>
+  );
+};
 
-export default App
+const handleSearch = async (query) => {
+  try {
+    const results = await searchMovies(query);
+    if (results.length === 0) {
+      alert("No movies found.");
+    } else {
+      setMovies(results);
+    }
+  } catch (error) {
+    alert("Error fetching movies.");
+  }
+};
+
+{movies.length === 0 && !error && (
+  <div className="text-gray-500">No movies found. Try a different search term.</div>
+)}
+
+export default App;

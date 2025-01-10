@@ -40,3 +40,8 @@
 .read-the-docs {
   color: #888;
 }
+
+.text-red-500 {
+  color: #f56565; /* Tailwind's red-500 color */
+}
+
